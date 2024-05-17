@@ -19,6 +19,7 @@
     "express": "^4.19.2",
     "js-crypto-aes": "^1.0.6",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.11.5"
+    "pg": "^8.11.5",
+    "swagger-ui-express": "^5.0.0"
   }
 }

@@ -21,11 +21,8 @@ router.post('/register', async (req, res) => {
     };
 
     try {
-        const result = await pool.query(query);
-        const user = result.rows[0];
-        const accessToken = jwt.sign({userId: user.id}, process.env.ACCESS_KEY, {expiresIn: '1h'});
-        const refreshToken = jwt.sign({userId: user.id}, process.env.REFRESH_KEY, {expiresIn: '7d'});
-        res.json({accessToken, refreshToken});
+        await pool.query(query);
+        res.status(200).json({message: "Successfully Registered"});
     } catch (error) {
         console.error(error);
         res.status(500).json({error: 'Failed to register user'});
