@@ -1,9 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const pg = require('pg');
-const {dbConfig} = require('./configs/dbConfig');
-const pool = new pg.Pool(dbConfig);
+const {pool} = require('./configs/dbConfig');
 const net = require('net');
 const CryptoJS = require('js-crypto-aes').CryptoJS;
 
@@ -51,6 +49,7 @@ const tcpServer = net.createServer((socket) => {
             const savedMessage = result.rows[0];
             console.log(`Saved message with ID: ${savedMessage.id}`);
 
+            // Отправляем зашифрованное сообщение всем участникам беседы
             const participantsQuery = {
                 text: `SELECT user_id
                        FROM participants

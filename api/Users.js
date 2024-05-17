@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const {pool, secretKey, refreshSecretKey} = require('../server');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const {authenticate, refreshToken} = require('./middleware/auth');
+const {refreshToken} = require('./middleware/auth');
+const {pool} = require("../configs/dbConfig");
 
 // Регистрация пользователя
 router.post('/register', async (req, res) => {
@@ -23,8 +23,8 @@ router.post('/register', async (req, res) => {
     try {
         const result = await pool.query(query);
         const user = result.rows[0];
-        const accessToken = jwt.sign({userId: user.id}, secretKey, {expiresIn: '1h'});
-        const refreshToken = jwt.sign({userId: user.id}, refreshSecretKey, {expiresIn: '7d'});
+        const accessToken = jwt.sign({userId: user.id}, process.env.ACCESS_KEY, {expiresIn: '1h'});
+        const refreshToken = jwt.sign({userId: user.id}, process.env.REFRESH_KEY, {expiresIn: '7d'});
         res.json({accessToken, refreshToken});
     } catch (error) {
         console.error(error);
