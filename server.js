@@ -11,7 +11,6 @@ app.use('/api', require('./api/Users'));
 const clients = {};
 
 const tcpServer = net.createServer((socket) => {
-    console.log('TCP client connected');
 
     // Добавление сокета клиента
     socket.on('login', (userId) => {
@@ -19,6 +18,7 @@ const tcpServer = net.createServer((socket) => {
             clients[userId] = [];
         }
         clients[userId].push(socket);
+        console.log('TCP client connected');
     });
 
     // Удаление сокета клиента
