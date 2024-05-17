@@ -5,6 +5,9 @@ const {pool} = require('./configs/dbConfig');
 const net = require('net');
 const CryptoJS = require('js-crypto-aes').CryptoJS;
 
+const appPort = process.env.APP_PORT || 8000;
+const tcpPort = process.env.TCP_PORT || 8080;
+
 app.use(bodyParser.json());
 app.use('/api', require('./api/Users'));
 
@@ -75,10 +78,10 @@ const tcpServer = net.createServer((socket) => {
     });
 });
 
-tcpServer.listen(3001, () => {
-    console.log('TCP server listening on port 3001');
+tcpServer.listen(tcpPort, () => {
+    console.log(`TCP server listening on port ${tcpPort}`);
 });
 
-app.listen(3000, () => {
-    console.log('Server listening on port 3000');
+app.listen(appPort, () => {
+    console.log(`Server listening on port ${appPort}`);
 });
