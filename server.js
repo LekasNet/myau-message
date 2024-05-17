@@ -40,7 +40,7 @@ const tcpServer = net.createServer((socket) => {
                 const message = JSON.parse(data);
                 console.log(`Received message: ${message.content}`);
                 // Шифруем сообщение
-                const encryptedMessage = CryptoJS.AES.encrypt(message.content, 'secret key').toString();
+                const encryptedMessage = CryptoJS.AES.encrypt(message.content, process.env.AES_KEY).toString();
                 // Сохраняем зашифрованное сообщение в базе данных
                 const query = {
                     text: `INSERT INTO messages (conversation_id, user_id, content, sent_at)
@@ -85,7 +85,6 @@ const tcpServer = net.createServer((socket) => {
                 console.error(err);
             }
         } else {
-            console.log(`Received invalid data: ${data}`);
         }
     });
 });
