@@ -5,8 +5,8 @@ const {pool} = require('./configs/dbConfig');
 const net = require('net');
 const CryptoJS = require('js-crypto-aes').CryptoJS;
 
-const appPort = process.env.APP_PORT || 8000;
-const tcpPort = process.env.TCP_PORT || 8080;
+const appPort = process.env.APP_PORT || 5000;
+const tcpPort = process.env.TCP_PORT || 5050;
 
 app.use(bodyParser.json());
 app.use('/api', require('./api/Users'));
