@@ -90,10 +90,12 @@ const tcpServer = net.createServer((socket) => {
     });
 });
 
+app.listen(appPort, () => {
+    console.log(`Server listening on port ${appPort}`);
+});
+
 tcpServer.listen(tcpPort, () => {
     console.log(`TCP server listening on port ${tcpPort}`);
 });
 
-app.listen(appPort, () => {
-    console.log(`Server listening on port ${appPort}`);
-});
+
