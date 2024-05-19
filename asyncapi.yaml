@@ -1,0 +1,52 @@
+asyncapi: 3.0.0
+info:
+  title: TCP Server API
+  version: 1.0.0
+  description: This is the AsyncAPI specification for the TCP server.
+servers:
+  tcp:
+    host: localhost:8080
+    protocol: tcp
+    description: This is the TCP server.
+channels:
+  messages:
+    address: messages
+    messages:
+      publishMessage.message:
+        $ref: '#/components/messages/message'
+      subscribeToMessage.message:
+        $ref: '#/components/messages/message'
+operations:
+  publishMessage:
+    action: receive
+    channel:
+      $ref: '#/channels/messages'
+    summary: Publishes a message
+    messages:
+      - $ref: '#/channels/messages/messages/publishMessage.message'
+  subscribeToMessage:
+    action: send
+    channel:
+      $ref: '#/channels/messages'
+    summary: Subscribes to a message
+    messages:
+      - $ref: '#/channels/messages/messages/subscribeToMessage.message'
+components:
+  messages:
+    message:
+      payload:
+        type: object
+        properties:
+          conversationId:
+            type: integer
+            description: The ID of the conversation.
+          userId:
+            type: integer
+            description: The ID of the user.
+          content:
+            type: string
+            description: The content of the message.
+          sentAt:
+            type: string
+            format: date-time
+            description: The date and time when the message was sent.

@@ -45,10 +45,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "accessToken": {
-                      "type": "string"
-                    },
-                    "refreshToken": {
+                    "message": {
                       "type": "string"
                     }
                   }
