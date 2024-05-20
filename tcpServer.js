@@ -4,8 +4,6 @@ const {pool} = require('./configs/dbConfig');
 
 const clients = {};
 
-const tcpPort = process.env.TCP_PORT || 8080;
-
 const tcpServer = net.createServer((socket) => {
 
     socket.write("Hello! Socket opened!")
@@ -83,10 +81,6 @@ const tcpServer = net.createServer((socket) => {
         }
     });
     console.log("TCP client connected")
-});
-
-tcpServer.listen(tcpPort, () => {
-    console.log(`TCP server listening on port ${tcpPort}`);
 });
 
 module.exports = tcpServer;
