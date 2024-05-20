@@ -8,7 +8,7 @@ const tcpPort = process.env.TCP_PORT || 8080;
 
 const tcpServer = net.createServer((socket) => {
 
-    // Добавление сокета клиента
+    // Добавление сокета клиента  ws.send
     socket.on('login', (userId) => {
         if (!clients[userId]) {
             clients[userId] = [];
