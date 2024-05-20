@@ -1,44 +1,27 @@
 const net = require('net');
 const CryptoJS = require('js-crypto-aes').CryptoJS;
-const {pool} = require('./configs/dbConfig');
+const { pool } = require('./configs/dbConfig');
 
 const clients = {};
 
 const tcpServer = net.createServer((socket) => {
+    console.log('TCP server opened!');
 
-    socket.write("Hello! Socket opened!")
-
-    // Добавление сокета клиента
-    socket.on('login', (userId) => {
-        if (!clients[userId]) {
-            clients[userId] = [];
-        }
-        clients[userId].push(socket);
-        console.log('TCP client connected');
-    });
-
-    // Удаление сокета клиента
-    socket.on('disconnect', () => {
-        for (const userId in clients) {
-            if (clients[userId].includes(socket)) {
-                clients[userId].splice(clients[userId].indexOf(socket), 1);
-            }
-        }
-        console.log('TCP client disconnected');
-    });
-
+    // Обработка данных, полученных от клиента
     socket.on('data', (data) => {
         if (typeof data === 'string') {
             try {
                 const message = JSON.parse(data);
                 console.log(`Received message: ${message.content}`);
+
                 // Шифруем сообщение
                 const encryptedMessage = CryptoJS.AES.encrypt(message.content, process.env.AES_KEY).toString();
+
                 // Сохраняем зашифрованное сообщение в базе данных
                 const query = {
                     text: `INSERT INTO messages (conversation_id, user_id, content, sent_at)
-                           VALUES ($1, $2, $3, $4)
-                           RETURNING *`,
+                 VALUES ($1, $2, $3, $4)
+                 RETURNING *`,
                     values: [message.conversationId, message.userId, encryptedMessage, new Date()],
                 };
                 pool.query(query, (err, result) => {
@@ -47,11 +30,12 @@ const tcpServer = net.createServer((socket) => {
                     } else {
                         const savedMessage = result.rows[0];
                         console.log(`Saved message with ID: ${savedMessage.id}`);
+
                         // Отправляем зашифрованное сообщение всем участникам беседы
                         const participantsQuery = {
                             text: `SELECT user_id
-                                   FROM participants
-                                   WHERE conversation_id = $1`,
+                     FROM participants
+                     WHERE conversation_id = $1`,
                             values: [message.conversationId],
                         };
                         pool.query(participantsQuery, (err, result) => {
@@ -80,7 +64,8 @@ const tcpServer = net.createServer((socket) => {
         } else {
         }
     });
-    console.log("TCP client connected")
+
+    console.log('TCP server closed');
 });
 
 module.exports = tcpServer;
