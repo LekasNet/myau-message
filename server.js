@@ -4,6 +4,8 @@ const userRouter = require('./api/Users');
 const conversationRouter = require('./api/Conversations');
 const swaggerRouter = require('./api/SwaggerApiUi');
 const tcpServer = require("./tcpServer");
+require('dotenv').config();
+
 
 const app = express();
 const appPort = process.env.APP_PORT || 8000;

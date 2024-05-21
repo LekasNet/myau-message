@@ -1,11 +1,11 @@
 const net = require('net');
-const CryptoJS = require('js-crypto-aes').CryptoJS;
+const crypto = require('crypto');
 const { pool } = require('./configs/dbConfig');
-const jwt = require('jsonwebtoken'); // Добавьте библиотеку для работы с JWT
+const jwt = require('jsonwebtoken');
 
 const clients = {};
 const tcpServer = net.createServer((socket) => {
-    console.log('TCP server opened!');
+    console.log('TCP server opened');
 
     socket.on('data', (data) => {
         try {
@@ -29,7 +29,9 @@ const tcpServer = net.createServer((socket) => {
             console.log(`Received message from user ${userId}: ${message.content}`);
 
             // Шифруем сообщение
-            const encryptedMessage = CryptoJS.AES.encrypt(message.content, process.env.AES_KEY).toString();
+            const cipher = crypto.createCipher('aes-256-cbc', process.env.AES_KEY);
+            let encryptedMessage = cipher.update(message.content, 'utf8', 'hex');
+            encryptedMessage += cipher.final('hex');
 
             // Сохраняем зашифрованное сообщение в базе данных
             const query = {
@@ -42,7 +44,7 @@ const tcpServer = net.createServer((socket) => {
                 if (err) {
                     console.error(err);
                 } else {
-                    const savedMessage = result.rows[0];
+                    const savedMessage = result.rows;
                     console.log(`Saved message with ID: ${savedMessage.id}`);
 
                     // Отправляем зашифрованное сообщение всем участникам беседы
