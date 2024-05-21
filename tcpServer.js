@@ -1,17 +1,32 @@
 const net = require('net');
 const CryptoJS = require('js-crypto-aes').CryptoJS;
-const {pool} = require('./configs/dbConfig');
+const { pool } = require('./configs/dbConfig');
+const jwt = require('jsonwebtoken'); // Добавьте библиотеку для работы с JWT
 
 const clients = {};
-
 const tcpServer = net.createServer((socket) => {
     console.log('TCP server opened!');
 
-    // Обработка данных, полученных от клиента
     socket.on('data', (data) => {
         try {
             const message = JSON.parse(data.toString());
-            console.log(`Received message: ${message.content}`);
+
+            if (!message.token) {
+                throw new Error('Token is required');
+            }
+
+            // Верифицируем токен
+            const decoded = jwt.verify(message.token, process.env.ACCESS_KEY);
+            const userId = decoded.userId;
+
+            if (!clients[userId]) {
+                clients[userId] = [];
+            }
+            if (!clients[userId].includes(socket)) {
+                clients[userId].push(socket);
+            }
+
+            console.log(`Received message from user ${userId}: ${message.content}`);
 
             // Шифруем сообщение
             const encryptedMessage = CryptoJS.AES.encrypt(message.content, process.env.AES_KEY).toString();
@@ -21,7 +36,7 @@ const tcpServer = net.createServer((socket) => {
                 text: `INSERT INTO messages (conversation_id, user_id, content, sent_at)
                        VALUES ($1, $2, $3, $4)
                        RETURNING *`,
-                values: [message.conversationId, message.userId, encryptedMessage, new Date()],
+                values: [message.conversationId, userId, encryptedMessage, new Date()],
             };
             pool.query(query, (err, result) => {
                 if (err) {
@@ -59,10 +74,21 @@ const tcpServer = net.createServer((socket) => {
             });
         } catch (err) {
             console.error(err);
+            // Отправляем ошибку клиенту
+            socket.write(JSON.stringify({ error: err.message }));
         }
     });
 
-    console.log('TCP server closed');
+    socket.on('close', () => {
+        console.log('TCP server closed');
+        // Удаляем сокет из списка клиентов
+        Object.keys(clients).forEach((userId) => {
+            const index = clients[userId].indexOf(socket);
+            if (index !== -1) {
+                clients[userId].splice(index, 1);
+            }
+        });
+    });
 });
 
 module.exports = tcpServer;
