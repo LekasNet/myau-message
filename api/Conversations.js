@@ -51,6 +51,26 @@ router.post('/:conversationId/users', authenticate, async (req, res) => {
     }
 });
 
+// Получить беседы, в которых состоит пользователь
+router.get('/user-conversations', authenticate, async (req, res) => {
+    const query = {
+        text: `SELECT c.id, c.name
+               FROM participants p
+                        JOIN conversations c ON p.conversation_id = c.id
+               WHERE p.user_id = $1`,
+        values: [req.userId],
+    };
+
+    try {
+        const result = await pool.query(query);
+        const conversations = result.rows;
+        res.json(conversations);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: 'Failed to get user conversations'});
+    }
+});
+
 // Получить участников беседы
 router.get('/:conversationId/users', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
