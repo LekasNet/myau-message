@@ -75,8 +75,6 @@ const tcpServer = net.createServer((socket) => {
                 }
             });
         } catch (err) {
-            console.error(err);
-            // Отправляем ошибку клиенту
             socket.write(JSON.stringify({ error: err.message }));
         }
     });
