@@ -7,17 +7,17 @@ const {pool} = require("../configs/dbConfig");
 
 // Регистрация пользователя
 router.post('/register', async (req, res) => {
-    const {username, password, phone} = req.body;
+    const {username, password, phone, user_img} = req.body;
     if (!username || !password) {
         return res.status(400).json({error: 'Username and password are required'});
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const query = {
-        text: `INSERT INTO users (username, password, phone)
-               VALUES ($1, $2, $3)
+        text: `INSERT INTO users (username, password, phone, user_img)
+               VALUES ($1, $2, $3, $4)
                RETURNING *`,
-        values: [username, hashedPassword, phone],
+        values: [username, hashedPassword, phone, user_img],
     };
 
     try {

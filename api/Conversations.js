@@ -5,23 +5,37 @@ const {pool} = require("../configs/dbConfig");
 
 // Создать беседу
 router.post('/', authenticate, async (req, res) => {
-    const {name} = req.body;
-    if (!name) {
-        return res.status(400).json({error: 'Conversation name is required'});
+    const {name, theme, conversation_img} = req.body;
+    if (!name || !theme) {
+        return res.status(400).json({error: 'Conversation name and theme are required'});
     }
 
-    const query = {
-        text: `INSERT INTO conversations (name, creator_id)
-               VALUES ($1, $2)
-               RETURNING *`,
-        values: [name, req.userId],
-    };
-
     try {
-        const result = await pool.query(query);
-        const conversation = result.rows[0];
+        await pool.query('BEGIN');
+
+        const conversationQuery = {
+            text: `INSERT INTO conversations (name, creator_id, theme, conversation_img)
+                   VALUES ($1, $2, $3, $4)
+                   RETURNING *`,
+            values: [name, req.userId, theme, conversation_img],
+        };
+
+        const conversationResult = await pool.query(conversationQuery);
+        const conversation = conversationResult.rows;
+
+        const participantQuery = {
+            text: `INSERT INTO participants (conversation_id, user_id)
+                   VALUES ($1, $2)`,
+            values: [conversation.id, req.userId],
+        };
+
+        await pool.query(participantQuery);
+
+        await pool.query('COMMIT');
+
         res.json({id: conversation.id, name: conversation.name});
     } catch (error) {
+        await pool.query('ROLLBACK');
         console.error(error);
         res.status(500).json({error: 'Failed to create conversation'});
     }
