@@ -15,7 +15,7 @@ const appPort = process.env.APP_PORT || 8000;
 app.use(bodyParser.json());
 app.use('/api/users', userRouter);
 app.use('/api/conversations', conversationRouter);
-app.use('/api/conversations', messageRouter);
+app.use('/api/conversation-messages', messageRouter);
 app.use('/api/admin', neuralRouter)
 app.use('/api/docs', swaggerRouter);
 
