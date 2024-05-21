@@ -52,3 +52,4 @@ docs/_build/
 .venv
 /.idea/
 .env
+my_model
