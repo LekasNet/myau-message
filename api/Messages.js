@@ -3,6 +3,7 @@ const router = express.Router();
 const {authenticate} = require('./middleware/auth');
 const {pool} = require("../configs/dbConfig");
 const crypto = require('crypto');
+require('dotenv').config();
 
 const key = process.env.AES_KEY;
 const iv = crypto.randomBytes(16);
