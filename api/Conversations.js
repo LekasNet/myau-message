@@ -21,7 +21,7 @@ router.post('/', authenticate, async (req, res) => {
         };
 
         const conversationResult = await pool.query(conversationQuery);
-        const conversation = conversationResult.rows;
+        const conversation = conversationResult.rows[0];
 
         const participantQuery = {
             text: `INSERT INTO participants (conversation_id, user_id)
