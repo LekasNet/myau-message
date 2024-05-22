@@ -825,7 +825,7 @@
         }
       }
     },
-    "/conversations/{conversationId}/messages": {
+    "/conversation-messages/{conversationId}/messages": {
       "post": {
         "summary": "Send a message in a conversation",
         "security": [

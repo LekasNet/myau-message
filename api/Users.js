@@ -43,7 +43,7 @@ router.post('/register', async (req, res) => {
 
 // Логин пользователя
 router.post('/login', async (req, res) => {
-    const {username, password} = req.body;
+    const {username, password, lastLoginTimestamp} = req.body;
     if (!username || !password) {
         return res.status(400).json({error: 'Username and password are required'});
     }
@@ -66,6 +66,14 @@ router.post('/login', async (req, res) => {
         if (!isValid) {
             return res.status(401).json({error: 'Invalid username or password'});
         }
+
+        const updateQuery = {
+            text: `UPDATE users
+                   SET last_login = $1
+                   WHERE id = $2`,
+            values: [lastLoginTimestamp, user.id],
+        };
+        await pool.query(updateQuery);
 
         const accessToken = jwt.sign({userId: user.id}, process.env.ACCESS_KEY, {expiresIn: '1h'});
         const refreshToken = jwt.sign({userId: user.id}, process.env.REFRESH_KEY, {expiresIn: '7d'});

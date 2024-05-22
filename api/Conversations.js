@@ -103,7 +103,7 @@ router.post('/:conversationId/users', authenticate, async (req, res) => {
 // Получить беседы, в которых состоит пользователь
 router.get('/user-conversations', authenticate, async (req, res) => {
     const query = {
-        text: `SELECT c.id, c.name
+        text: `SELECT c.id, c.name, c.conversation_img
                FROM participants p
                         JOIN conversations c ON p.conversation_id = c.id
                WHERE p.user_id = $1`,
