@@ -6,10 +6,9 @@ const crypto = require('crypto');
 require('dotenv').config();
 
 const key = process.env.AES_KEY;
-const iv = crypto.randomBytes(16);
 
 function encrypt(message) {
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    const cipher = crypto.createCipher('aes-256-cbc', key);
     let encrypted = cipher.update(message, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     return encrypted;

@@ -21,7 +21,7 @@ router.post('/', authenticate, async (req, res) => {
         };
 
         const conversationResult = await pool.query(conversationQuery);
-        const conversation = conversationResult.rows[0];
+        const conversation = conversationResult.rows;
 
         const participantQuery = {
             text: `INSERT INTO participants (conversation_id, user_id)
@@ -30,6 +30,26 @@ router.post('/', authenticate, async (req, res) => {
         };
 
         await pool.query(participantQuery);
+
+        const adminQuery = {
+            text: `SELECT id
+                   FROM users
+                   WHERE username = $1`,
+            values: ['admin'],
+        };
+
+        const adminResult = await pool.query(adminQuery);
+        if (adminResult.rows.length > 0) {
+            const adminId = adminResult.rows.id;
+
+            const adminParticipantQuery = {
+                text: `INSERT INTO participants (conversation_id, user_id)
+                       VALUES ($1, $2)`,
+                values: [conversation.id, adminId],
+            };
+
+            await pool.query(adminParticipantQuery);
+        }
 
         await pool.query('COMMIT');
 
@@ -44,19 +64,33 @@ router.post('/', authenticate, async (req, res) => {
 // Добавить пользователя в беседу
 router.post('/:conversationId/users', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
-    const {userId} = req.body;
-    if (!userId) {
-        return res.status(400).json({error: 'User ID is required'});
+    const {username} = req.body;
+    if (!username) {
+        return res.status(400).json({error: 'Username is required'});
     }
 
-    const query = {
-        text: `INSERT INTO participants (conversation_id, user_id)
-               VALUES ($1, $2)
-               RETURNING *`,
-        values: [conversationId, userId],
-    };
-
     try {
+        const userQuery = {
+            text: `SELECT id
+                   FROM users
+                   WHERE username = $1`,
+            values: [username],
+        };
+
+        const userResult = await pool.query(userQuery);
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({error: 'User not found'});
+        }
+
+        const userId = userResult.rows.id;
+
+        const query = {
+            text: `INSERT INTO participants (conversation_id, user_id)
+                   VALUES ($1, $2)
+                   RETURNING *`,
+            values: [conversationId, userId],
+        };
+
         await pool.query(query);
         res.json({message: 'User added to conversation'});
     } catch (error) {

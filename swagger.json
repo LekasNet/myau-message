@@ -34,7 +34,8 @@
                 },
                 "required": [
                   "username",
-                  "password"
+                  "password",
+                  "phone"
                 ]
               }
             }
@@ -472,12 +473,12 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "userId": {
-                    "type": "integer"
+                  "username": {
+                    "type": "string"
                   }
                 },
                 "required": [
-                  "userId"
+                  "username"
                 ]
               }
             }
@@ -516,6 +517,21 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {

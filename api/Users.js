@@ -12,15 +12,27 @@ router.post('/register', async (req, res) => {
         return res.status(400).json({error: 'Username and password are required'});
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const query = {
-        text: `INSERT INTO users (username, password, phone, user_img)
-               VALUES ($1, $2, $3, $4)
-               RETURNING *`,
-        values: [username, hashedPassword, phone, user_img],
-    };
-
     try {
+        const usernameQuery = {
+            text: `SELECT 1
+                   FROM users
+                   WHERE username = $1`,
+            values: [username],
+        };
+
+        const usernameResult = await pool.query(usernameQuery);
+        if (usernameResult.rows.length > 0) {
+            return res.status(400).json({error: 'Username already exists'});
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const query = {
+            text: `INSERT INTO users (username, password, phone, user_img)
+                   VALUES ($1, $2, $3, $4)
+                   RETURNING *`,
+            values: [username, hashedPassword, phone, user_img],
+        };
+
         await pool.query(query);
         res.status(200).json({message: "Successfully Registered"});
     } catch (error) {
@@ -61,6 +73,40 @@ router.post('/login', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({error: 'Failed to login user'});
+    }
+});
+
+// Логин администратора
+router.post('/admin/login', async (req, res) => {
+    const {username, password} = req.body;
+    if (!username || !password) {
+        return res.status(400).json({error: 'Username and password are required'});
+    }
+
+    const query = {
+        text: `SELECT *
+               FROM users
+               WHERE username = $1`,
+        values: [username],
+    };
+
+    try {
+        const result = await pool.query(query);
+        const user = result.rows;
+        if (!user || user.username !== 'admin') {
+            return res.status(401).json({error: 'Invalid username or password'});
+        }
+
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) {
+            return res.status(401).json({error: 'Invalid username or password'});
+        }
+
+        const accessToken = jwt.sign({userId: user.id}, process.env.ACCESS_KEY);
+        res.json({accessToken});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: 'Failed to login admin'});
     }
 });
 
