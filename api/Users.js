@@ -92,7 +92,7 @@ router.post('/admin/login-admin', async (req, res) => {
 
     try {
         const result = await pool.query(query);
-        const user = result.rows;
+        const user = result.rows[0];
         if (!user || user.username !== 'admin') {
             return res.status(401).json({error: 'Invalid username or password'});
         }

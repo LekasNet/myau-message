@@ -39,15 +39,14 @@ router.post('/', authenticate, async (req, res) => {
         };
 
         const adminResult = await pool.query(adminQuery);
-        const conversationAdmin = adminResult.rows[0];
 
         if (adminResult.rows.length > 0) {
-            const adminId = adminResult.rows.id;
+            const adminId = adminResult.rows[0].id;
 
             const adminParticipantQuery = {
                 text: `INSERT INTO participants (conversation_id, user_id)
                        VALUES ($1, $2)`,
-                values: [conversationAdmin.id, adminId],
+                values: [conversation.id, adminId],
             };
 
             await pool.query(adminParticipantQuery);
