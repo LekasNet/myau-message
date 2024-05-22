@@ -1,52 +1,41 @@
-import re
-import string
-import nltk
-from nltk import WordNetLemmatizer
-from nltk.corpus import stopwords
-from pydantic import BaseModel
+import os
 from fastapi import FastAPI
 import requests
 import asyncio
-
 from sraca import predict
+from icecream import ic
+from dotenv import load_dotenv
 
-nltk.download('stopwords')
-stop_words = set(stopwords.words('russian'))
-
-lemmatizer = WordNetLemmatizer()
-
-
-class Message(BaseModel):
-    theme: str
-    message: str
-
+load_dotenv()
 
 app = FastAPI()
 
 
-def preprocess_text(text):
-    ban_word_twitch = string.punctuation + '—' + '«' + '»' + '...' + '“' + '”' + '„' + '‘' + '’'
-    pattern = f'[{re.escape(ban_word_twitch)}]|[0-9]|[a-zA-Z]'
-    text = re.sub(pattern, ' ', text)
-    text = text.lower()
-    words = nltk.word_tokenize(text)
-    words = [word for word in words if word not in stop_words]
-    words = [lemmatizer.lemmatize(word) for word in words]
-    text = ' '.join(words)
-    return text
+@app.get("/get/conversations")
+async def get_conversations():
+    response = requests.get("https://myau-message.onrender.com/api/conversations/user-conversations",
+                            headers={"Authorization": os.getenv("TOKEN")}).json()
+    ic(response)
+    answer = [{"id": i["id"]} for i in response]
+    return answer
 
 
 @app.get("/data")
-async def get_data():
-    response = requests.get("<ссылка на Лешен сервак>")
+async def get_message(id):
+    response = requests.get(f"https://myau-message.onrender.com/api/admin/conversations/{id}/1ast_message",
+                            headers={"Authorization": os.getenv("TOKEN")})
+    ic(response)
+    if response.status_code == 404:
+        return {"response": None}
     data = response.json()
     response = await predict(data["theme"], data["massage"])
     return {"response": response, "id": data["id"]}
 
 
-@app.post("/send_data")
-async def send_data(data: dict):
-    response = requests.post("<ссылка на Лешен сервак>", json=data)
+@app.patch("/send_data")
+async def send_data(id):
+    response = requests.patch(f"https://myau-message.onrender.com/api/admin/messages/{id}/ban",
+                              headers={"Authorization": os.getenv("TOKEN")})
     if response.status_code == 200:
         return {"message": "Data sent successfully"}
     else:
@@ -55,8 +44,13 @@ async def send_data(data: dict):
 
 async def poll_data():
     while True:
-        data = await get_data()
-        await send_data(data)
+        conversations = get_conversations()
+        for conversation in conversations:
+            data = await get_message(conversation["id"])
+            if data["response"] is None:
+                continue
+            if not data["response"]:
+                await send_data(data["id"])
         await asyncio.sleep(0.5)
 
 
