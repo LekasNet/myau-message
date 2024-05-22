@@ -6,13 +6,13 @@ const {authenticate} = require("./middleware/auth");
 // Получить последнее сообщение из беседы с колонкой read_admin = false
 router.get('/conversations/:conversationId/last_message', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
-
     const query = {
-        text: `SELECT *
-               FROM messages
-               WHERE conversation_id = $1
-                 AND read_admin = false
-               ORDER BY sent_at DESC
+        text: `SELECT m.*, c.theme
+               FROM messages m
+                        JOIN conversations c ON m.conversation_id = c.id
+               WHERE m.conversation_id = $1
+                 AND m.read_admin = false
+               ORDER BY m.sent_at DESC
                LIMIT 1`,
         values: [conversationId],
     };

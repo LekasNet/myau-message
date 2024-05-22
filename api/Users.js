@@ -77,7 +77,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Логин администратора
-router.post('/admin/login', async (req, res) => {
+router.post('/admin/login-admin', async (req, res) => {
     const {username, password} = req.body;
     if (!username || !password) {
         return res.status(400).json({error: 'Username and password are required'});
