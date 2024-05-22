@@ -24,7 +24,7 @@ function aesEncrypt(text, key) {
 function aesDecrypt(encrypted, key) {
     const iv = new Uint8Array(16); // Пока фиксированный вектор, в будущем будет заменен на случайный
     const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    let decrypted = decipher.update(Buffer.from(encrypted, 'hex'));
     decrypted += decipher.final('utf8');
     return decrypted;
 }
@@ -86,7 +86,7 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
         const user = userResult.rows[0];
         const timestamp = user.last_login;
 
-        const key = getSHA256Key(req.headers.Authorization + timestamp).substring(0, 32);
+        const key = Buffer.from((req.headers.Authorization + timestamp).substring(0, 32));
 
         const query = {
             text: `WITH unread_messages AS (
