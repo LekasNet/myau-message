@@ -19,7 +19,7 @@ router.get('/conversations/:conversationId/last_message', authenticate, async (r
 
     try {
         const result = await pool.query(query);
-        const message = result.rows;
+        const message = result.rows[0];
         if (message) {
             await pool.query(`UPDATE messages
                               SET read_admin = true

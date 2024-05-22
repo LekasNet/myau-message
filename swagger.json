@@ -104,11 +104,15 @@
                   },
                   "password": {
                     "type": "string"
+                  },
+                  "lastLoginTimestamp": {
+                    "type": "string"
                   }
                 },
                 "required": [
                   "username",
-                  "password"
+                  "password",
+                  "lastLoginTimestamp"
                 ]
               }
             }
