@@ -83,7 +83,7 @@ router.post('/:conversationId/users', authenticate, async (req, res) => {
             return res.status(404).json({error: 'User not found'});
         }
 
-        const userId = userResult.rows.id;
+        const userId = userResult.rows[0].id;
 
         const query = {
             text: `INSERT INTO participants (conversation_id, user_id)
