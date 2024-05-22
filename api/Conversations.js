@@ -120,25 +120,30 @@ router.get('/user-conversations', authenticate, async (req, res) => {
     }
 });
 
-// Получить участников беседы
-router.get('/:conversationId/users', authenticate, async (req, res) => {
+// Удалить беседу
+router.delete('/:conversationId', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
 
-    const query = {
-        text: `SELECT u.id, u.username
-               FROM participants p
-                        JOIN users u ON p.user_id = u.id
-               WHERE p.conversation_id = $1`,
-        values: [conversationId],
-    };
-
     try {
-        const result = await pool.query(query);
-        const users = result.rows;
-        res.json(users);
+        await pool.query({
+            text: `DELETE
+                   FROM participants
+                   WHERE conversation_id = $1`,
+            values: [conversationId],
+        });
+
+        await pool.query({
+            text: `DELETE
+                   FROM conversations
+                   WHERE id = $1
+                     AND creator_id = $2`,
+            values: [conversationId, req.userId],
+        });
+
+        res.json({message: 'Conversation deleted'});
     } catch (error) {
         console.error(error);
-        res.status(500).json({error: 'Failed to get conversation participants'});
+        res.status(500).json({error: 'Failed to delete conversation'});
     }
 });
 
