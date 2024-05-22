@@ -34,6 +34,3 @@ async def predict(theme, message, threshold=0.5):
     response = theme in [th for th in themes if pretion[themes.index(th)]==True]
     ic(response)
     return response
-
-
-print(predict("Кино", "Актер сыграл отличную коль в фильме Мото Мото"))

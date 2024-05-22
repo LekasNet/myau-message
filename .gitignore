@@ -53,3 +53,4 @@ docs/_build/
 /.idea/
 .env
 my_model
+criptor.py
