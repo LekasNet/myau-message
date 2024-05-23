@@ -49,7 +49,7 @@ router.post('/:conversationId/messages', authenticate, async (req, res) => {
         const timestamp = user.last_login;
         console.log(timestamp);
 
-        const key = getSHA256Key(req.headers.Authorization + timestamp).substring(0, 32);
+        const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 32);
 
         console.log(req);
         console.log(req.headers);
@@ -90,7 +90,7 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
         const user = userResult.rows[0];
         const timestamp = user.last_login;
 
-        const key = Buffer.from((req.headers.Authorization + timestamp).substring(0, 32));
+        const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 32);
 
         const query = {
             text: `WITH unread_messages AS (
