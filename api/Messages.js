@@ -78,6 +78,9 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
     const fromDate = req.query.fromDate;
 
+    console.log(fromDate);
+    console.log(conversationId);
+
     try {
         const userQuery = {
             text: `SELECT last_login
