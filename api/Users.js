@@ -65,6 +65,7 @@ router.post('/login', async (req, res) => {
         }
 
         const {publicKey, privateKey} = await generateRSAKeys();
+        console.log(privateKey);
 
         const updateQuery = {
             text: `UPDATE users
@@ -105,6 +106,7 @@ router.post('/login/verify', async (req, res) => {
         }
 
         const privateKey = user.temporary_key;
+        console.log(privateKey);
         const decryptedPassword = await decryptRSA(password, privateKey);
         const decryptedLastLogin = await decryptRSA(lastLoginTimestamp, privateKey);
 
