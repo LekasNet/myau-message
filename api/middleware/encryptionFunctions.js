@@ -21,7 +21,7 @@ function pemToPrivateKey(pem) {
 function decryptRSA(encryptedMessage, privateKeyPem) {
     try {
         const privateKey = pemToPrivateKey(privateKeyPem);
-        return privateKey.decrypt(forge.util.decode64(encryptedMessage), 'RSA-OAEP');
+        return privateKey.decrypt(forge.util.decode64(encryptedMessage), 'RSAES-PKCS1-V1_5');
     } catch (e) {
         console.error('Decryption error:', e);
     }
