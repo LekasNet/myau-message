@@ -16,10 +16,7 @@ function aesEncrypt(text, hexKey) {
     const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    return {
-        iv: iv.toString('hex'),
-        encryptedData: encrypted
-    };
+    return encrypted;
 }
 
 function aesDecrypt(encrypted, hexKey) {
@@ -92,8 +89,10 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
         const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 64);
 
         const messagesQuery = {
-            text: `SELECT m.*
+            text: `SELECT m.id, m.conversation_id, u.username, m.content, m.sent_at, m.read, m.ban, m.read_admin,
+                          (m.user_id = $3) AS isMine
                    FROM messages m
+                            JOIN users u ON m.user_id = u.id
                             JOIN participants p ON m.conversation_id = p.conversation_id
                    WHERE m.conversation_id = $1
                      AND m.sent_at < $2
