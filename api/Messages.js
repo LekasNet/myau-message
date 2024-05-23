@@ -26,7 +26,7 @@ function aesDecrypt(encrypted, hexKey) {
     const key = Buffer.from(hexKey, 'hex');
     const iv = Buffer.alloc(16); // Пока фиксированный вектор
     const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encrypted.encryptedData, 'hex');
+    let decrypted = decipher.update(encrypted, 'hex');
     decrypted += decipher.final('utf8');
     return decrypted;
 }
@@ -52,8 +52,6 @@ router.post('/:conversationId/messages', authenticate, async (req, res) => {
         const timestamp = user.last_login;
 
         const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 64);
-        console.log(content);
-        console.log(key);
 
         const query = {
             text: `INSERT INTO messages (conversation_id, user_id, content, sent_at)
