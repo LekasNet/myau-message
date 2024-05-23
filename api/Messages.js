@@ -76,7 +76,7 @@ router.post('/:conversationId/messages', authenticate, async (req, res) => {
 // Получить 100 сообщений из беседы от конкретной даты
 router.get('/:conversationId/messages', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
-    const fromDate = req.query.fromDate;
+    const fromDate = req.headers.fromDate;
 
     console.log(fromDate);
     console.log(conversationId);
