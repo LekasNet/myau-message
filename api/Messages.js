@@ -78,6 +78,8 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
     const {fromDate} = req.headers;
 
+    console.log(req.headers)
+
     console.log(fromDate);
     console.log(conversationId);
 
