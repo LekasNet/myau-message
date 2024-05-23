@@ -18,7 +18,7 @@ function pemToPrivateKey(pem) {
 }
 
 
-function decryptRSA(privateKeyPem, encryptedMessage) {
+function decryptRSA(encryptedMessage, privateKeyPem) {
     try {
         const privateKey = pemToPrivateKey(privateKeyPem);
         return privateKey.decrypt(forge.util.decode64(encryptedMessage), 'RSA-OAEP');
@@ -48,5 +48,7 @@ function aesDecrypt(encrypted, hexKey) {
     decrypted += decipher.final('utf8');
     return decrypted;
 }
+
+
 
 module.exports = {generateRSAKeys, decryptRSA, getSHA256Key, aesEncrypt, aesDecrypt, publicKeyToPem, privateKeyToPem};
