@@ -76,12 +76,7 @@ router.post('/:conversationId/messages', authenticate, async (req, res) => {
 // Получить 100 сообщений из беседы от конкретной даты
 router.get('/:conversationId/messages', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
-    const {fromDate} = req.headers;
-
-    console.log(req.headers)
-
-    console.log(fromDate);
-    console.log(conversationId);
+    const {fromdate} = req.headers;
 
     try {
         const userQuery = {
@@ -105,7 +100,7 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
                      AND p.user_id = $3
                    ORDER BY m.sent_at DESC
                    LIMIT 100;`,
-            values: [conversationId, fromDate, req.userId],
+            values: [conversationId, fromdate, req.userId],
         };
 
         const messagesResult = await pool.query(messagesQuery);
