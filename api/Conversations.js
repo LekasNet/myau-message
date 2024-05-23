@@ -145,17 +145,34 @@ router.get('/:conversationId/users', authenticate, async (req, res) => {
 // Удалить беседу
 router.delete('/:conversationId', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
-
-    const query = {
-        text: `DELETE
-               FROM conversations
-               WHERE id = $1
-                 AND creator_id = $2`,
-        values: [conversationId, req.userId],
-    };
+    const userId = req.userId;
 
     try {
-        await pool.query(query);
+        // Удалить сообщения в беседе
+        await pool.query({
+            text: `DELETE
+                   FROM messages
+                   WHERE conversation_id = $1`,
+            values: [conversationId],
+        });
+
+        // Удалить участников беседы
+        await pool.query({
+            text: `DELETE
+                   FROM participants
+                   WHERE conversation_id = $1`,
+            values: [conversationId],
+        });
+
+        // Удалить саму беседу
+        await pool.query({
+            text: `DELETE
+                   FROM conversations
+                   WHERE id = $1
+                     AND creator_id = $2`,
+            values: [conversationId, userId],
+        });
+
         res.status(200).json({message: 'Conversation deleted'});
     } catch (error) {
         console.error(error);
