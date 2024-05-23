@@ -112,7 +112,7 @@ router.get('/user-conversations', authenticate, async (req, res) => {
 
     try {
         const result = await pool.query(query);
-        const conversations = result.rows[0];
+        const conversations = result.rows;
         res.status(200).json(conversations);
     } catch (error) {
         console.error(error);
