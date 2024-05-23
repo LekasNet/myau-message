@@ -14,9 +14,9 @@ tokenizer = AutoTokenizer.from_pretrained('my_model')
 themes = ["Программирование", "Кино", "Книги", "Музыка", "Игры", "Юмор", "Экономика", "История"]
 
 
-async def predict(theme, message, threshold=0.85):
+async def predict(theme, message, threshold=0.75):
     inputs = tokenizer.encode_plus(
-        f"{theme}[SET]{message}",
+        f"{message}",
         add_special_tokens=True,
         max_length=1024,
         truncation=False,

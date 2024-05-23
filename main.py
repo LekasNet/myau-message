@@ -1,4 +1,6 @@
 import os
+import random
+
 import requests
 import asyncio
 from criptor import use_decrypt
@@ -8,7 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ic.disable()
+ic.enable()
 
 
 async def get_conversations():
@@ -49,8 +51,9 @@ async def poll_data():
             data = await get_message(conversation['id'])
             if data["response"] is None:
                 continue
-            await send_data(data["id"], {"ban": data["response"]})
-        await asyncio.sleep(0.5)
+            await asyncio.sleep(random.randint(1, 5))
+            await send_data(data["id"], {"ban": not data["response"]})
+        await asyncio.sleep(random.randint(1, 10))
 
 
 async def main():
