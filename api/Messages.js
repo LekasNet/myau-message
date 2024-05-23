@@ -34,7 +34,7 @@ function aesDecrypt(encrypted, hexKey) {
 // Отправить сообщение в беседу
 router.post('/:conversationId/messages', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
-    const {message} = req.body.content;
+    const message = req.body.content;
     if (!message) {
         return res.status(400).json({error: 'Message content is required'});
     }
