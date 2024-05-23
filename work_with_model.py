@@ -16,9 +16,9 @@ themes = ["Программирование", "Кино", "Книги", "Муз�
 
 async def predict(theme, message, threshold=0.5):
     inputs = tokenizer.encode_plus(
-        f"{theme} [SEP] {message}",
+        f"{message}",
         add_special_tokens=True,
-        max_length=512,
+        max_length=1024,
         truncation=False,
         return_attention_mask=True,
         return_tensors='pt'
