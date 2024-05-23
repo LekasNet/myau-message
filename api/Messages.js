@@ -50,6 +50,8 @@ router.post('/:conversationId/messages', authenticate, async (req, res) => {
         console.log(timestamp);
 
         const key = getSHA256Key(req.headers.Authorization + timestamp).substring(0, 32);
+        console.log(req.headers.Authorization);
+        console.log(key);
 
         const query = {
             text: `INSERT INTO messages (conversation_id, user_id, content, sent_at)
