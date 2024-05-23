@@ -17,13 +17,6 @@ function decryptRSA(privateKey, encryptedMessage) {
     }
 }
 
-// Пример использования
-const {publicKey, privateKey} = generateRSAKeys();
-console.log(publicKeyToPem(publicKey));
-const encrypted = forge.util.encode64(publicKey.encrypt('Hello, world!', 'RSA-OAEP'));
-const decrypted = decryptRSA(privateKey, encrypted);
-console.log('Decrypted message:', decrypted);
-
 function getSHA256Key(data) {
     return crypto.createHash('sha256').update(data).digest('hex');
 }
