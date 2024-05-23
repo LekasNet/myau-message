@@ -34,8 +34,8 @@ function aesDecrypt(encrypted, hexKey) {
 // Отправить сообщение в беседу
 router.post('/:conversationId/messages', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
-    const {content} = req.body;
-    if (!content) {
+    const {message} = req.body.content;
+    if (!message) {
         return res.status(400).json({error: 'Message content is required'});
     }
 
@@ -56,7 +56,7 @@ router.post('/:conversationId/messages', authenticate, async (req, res) => {
             text: `INSERT INTO messages (conversation_id, user_id, content, sent_at)
                    VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
                    RETURNING *`,
-            values: [conversationId, req.userId, aesDecrypt(content, key)],
+            values: [conversationId, req.userId, aesDecrypt(message, key)],
         };
 
         try {
