@@ -34,7 +34,7 @@ function aesDecrypt(encrypted, hexKey) {
 // Отправить сообщение в беседу
 router.post('/:conversationId/messages', authenticate, async (req, res) => {
     const conversationId = req.params.conversationId;
-    const { content } = req.body;
+    const {content} = req.body;
 
     if (!content) {
         return res.status(400).json({error: 'Message content is required'});
@@ -108,6 +108,8 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
 
         try {
             const result = await pool.query(query);
+            console.log(result.rows);
+            console.log(result.rows[0]);
             const messages = result.rows[0].map((message) => {
                 return {
                     ...aesEncrypt(message, key)
