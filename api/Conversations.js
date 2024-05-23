@@ -134,7 +134,7 @@ router.get('/:conversationId/users', authenticate, async (req, res) => {
 
     try {
         const result = await pool.query(query);
-        const users = result.rows[0];
+        const users = result.rows;
         res.status(200).json(users);
     } catch (error) {
         console.error(error);
