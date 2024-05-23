@@ -104,7 +104,7 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
         };
 
         const messagesResult = await pool.query(messagesQuery);
-        const messages = messagesResult.rows[0].map((message) => {
+        const messages = messagesResult.rows.map((message) => {
             return {
                 ...aesEncrypt(message, key)
             };
