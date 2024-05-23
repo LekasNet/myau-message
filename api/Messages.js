@@ -10,21 +10,23 @@ function getSHA256Key(data) {
     return crypto.createHash('sha256').update(data).digest('hex');
 }
 
-function aesEncrypt(text, key) {
-    const iv = new Uint8Array(16); // Пока фиксированный вектор, в будущем будет заменен на случайный
+function aesEncrypt(text, hexKey) {
+    const key = Buffer.from(hexKey, 'hex');
+    const iv = Buffer.alloc(16); // Пока фиксированный вектор
     const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     return {
-        iv: iv,
+        iv: iv.toString('hex'),
         encryptedData: encrypted
     };
 }
 
-function aesDecrypt(encrypted, key) {
-    const iv = new Uint8Array(16); // Пока фиксированный вектор, в будущем будет заменен на случайный
+function aesDecrypt(encrypted, hexKey) {
+    const key = Buffer.from(hexKey, 'hex');
+    const iv = Buffer.alloc(16); // Пока фиксированный вектор
     const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(Buffer.from(encrypted, 'hex'));
+    let decrypted = decipher.update(encrypted.encryptedData, 'hex');
     decrypted += decipher.final('utf8');
     return decrypted;
 }
