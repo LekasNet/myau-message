@@ -89,7 +89,14 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
         const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 64);
 
         const messagesQuery = {
-            text: `SELECT m.id, m.conversation_id, u.username, m.content, m.sent_at, m.read, m.ban, m.read_admin,
+            text: `SELECT m.id,
+                          m.conversation_id,
+                          u.username,
+                          m.content,
+                          m.sent_at,
+                          m.read,
+                          m.ban,
+                          m.read_admin,
                           (m.user_id = $3) AS isMine
                    FROM messages m
                             JOIN users u ON m.user_id = u.id
@@ -104,9 +111,8 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
 
         const messagesResult = await pool.query(messagesQuery);
         const messages = messagesResult.rows.map((message) => {
-            return {
-                ...aesEncrypt(message.toString(), key)
-            };
+            const messageJson = JSON.stringify(message);
+            return aesEncrypt(messageJson, key);
         });
 
         const conversationQuery = {
