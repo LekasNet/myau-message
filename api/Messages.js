@@ -47,6 +47,7 @@ router.post('/:conversationId/messages', authenticate, async (req, res) => {
         const userResult = await pool.query(userQuery);
         const user = userResult.rows[0];
         const timestamp = user.last_login;
+        console.log(timestamp);
 
         const key = getSHA256Key(req.headers.Authorization + timestamp).substring(0, 32);
 
