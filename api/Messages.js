@@ -91,38 +91,50 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
 
         const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 64);
 
-        const query = {
-            text: `WITH unread_messages AS (
-                UPDATE messages
-                    SET read = true
-                    WHERE conversation_id = $1 AND user_id != $2 AND read = false
-                    RETURNING *)
-                   SELECT *
+        const messagesQuery = {
+            text: `SELECT *
                    FROM messages
                    WHERE conversation_id = $1
-                     AND sent_at < $3
+                     AND sent_at < $2
                    ORDER BY sent_at DESC
                    LIMIT 100;`,
-            values: [conversationId, req.userId, fromDate],
+            values: [conversationId, fromDate],
         };
 
-        try {
-            const result = await pool.query(query);
-            console.log(result.rows);
-            console.log(result.rows[0]);
-            const messages = result.rows[0].map((message) => {
-                return {
-                    ...aesEncrypt(message, key)
-                };
-            });
-            res.status(200).json(messages);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({error: 'Failed to retrieve messages'});
+        const messagesResult = await pool.query(messagesQuery);
+        const messages = messagesResult.rows[0].map((message) => {
+            return {
+                ...aesEncrypt(message, key)
+            };
+        });
+
+        const conversationQuery = {
+            text: `SELECT user_id
+                   FROM conversations
+                   WHERE id = $1`,
+            values: [conversationId],
+        };
+
+        const conversationResult = await pool.query(conversationQuery);
+        const conversationCreatorId = conversationResult.rows.user_id;
+
+        if (req.userId !== conversationCreatorId) {
+            const updateQuery = {
+                text: `UPDATE messages
+                       SET read = true
+                       WHERE conversation_id = $1
+                         AND user_id != $2
+                         AND read = false`,
+                values: [conversationId, req.userId],
+            };
+
+            await pool.query(updateQuery);
         }
+
+        res.status(200).json(messages);
     } catch (error) {
         console.error(error);
-        res.status(500).json({error: 'Failed to retrieve user'});
+        res.status(500).json({error: 'Failed to retrieve messages'});
     }
 });
 
