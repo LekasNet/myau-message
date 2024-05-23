@@ -70,7 +70,7 @@ class LoginPage extends StatelessWidget {
                     ),
                     onPressed: () async {
                       await login(_phoneController.text, _passwordController.text);
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation, secondaryAnimation) => MainPage(),

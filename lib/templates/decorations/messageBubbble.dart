@@ -46,6 +46,7 @@ class MessageBubble extends StatelessWidget {
             child: Column(
               crossAxisAlignment: message.isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: <Widget>[
+                if (!message.isSentByMe) Text(message.author, style: TextStyle(color: Colors.black.withOpacity(0.5)),),
                 if (oneLine && message.isSentByMe)
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.end,
@@ -54,7 +55,8 @@ class MessageBubble extends StatelessWidget {
                       Text(message.text, style: TextStyle(color: message.isSentByMe ? Colors.white : Colors.black)),
                       SizedBox(width: 5),
                       Text(formattedTime, style: TextStyle(color: message.isSentByMe ? Colors.white70 : Colors.black, fontSize: 12)),
-                      if (message.isSentByMe) Icon(message.isSeen ? Icons.done_all : Icons.done, size: 16, color: message.isSeen ? Colors.blue : Colors.white70),
+                      if (message.isSentByMe) SizedBox(width: 2),
+                      if (message.isSentByMe) Icon(message.isSeen ? Icons.done_all : Icons.done, size: 16, color: message.isSeen ? Colors.white : Colors.white70),
                     ],
                   )
                 else
