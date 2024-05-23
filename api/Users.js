@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {refreshToken} = require('./middleware/auth');
 const {pool} = require("../configs/dbConfig");
-const {generateRSAKeys, decryptRSA, publicKeyToPem} = require('./middleware/encryptionFunctions');
+const {generateRSAKeys, decryptRSA, publicKeyToPem, privateKeyToPem} = require('./middleware/encryptionFunctions');
 
 
 // Регистрация пользователя
@@ -65,7 +65,6 @@ router.post('/login', async (req, res) => {
         }
 
         const {publicKey, privateKey} = await generateRSAKeys();
-        console.log(privateKey);
 
         const updateQuery = {
             text: `UPDATE users
@@ -105,8 +104,7 @@ router.post('/login/verify', async (req, res) => {
             return res.status(401).json({error: 'Invalid username or password'});
         }
 
-        const privateKey = user.temporary_key;
-        console.log(privateKey);
+        const privateKey = privateKeyToPem(user.temporary_key);
         const decryptedPassword = await decryptRSA(password, privateKey);
         const decryptedLastLogin = await decryptRSA(lastLoginTimestamp, privateKey);
 

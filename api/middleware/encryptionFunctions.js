@@ -9,8 +9,18 @@ function publicKeyToPem(publicKey) {
     return forge.pki.publicKeyToPem(publicKey);
 }
 
-function decryptRSA(privateKey, encryptedMessage) {
+function privateKeyToPem(privateKey) {
+    return forge.pki.privateKeyToPem(privateKey);
+}
+
+function pemToPrivateKey(pem) {
+    return forge.pki.privateKeyFromPem(pem);
+}
+
+
+function decryptRSA(privateKeyPem, encryptedMessage) {
     try {
+        const privateKey = pemToPrivateKey(privateKeyPem);
         return privateKey.decrypt(forge.util.decode64(encryptedMessage), 'RSA-OAEP');
     } catch (e) {
         console.error('Decryption error:', e);
@@ -39,4 +49,4 @@ function aesDecrypt(encrypted, hexKey) {
     return decrypted;
 }
 
-module.exports = {generateRSAKeys, decryptRSA, getSHA256Key, aesEncrypt, aesDecrypt, publicKeyToPem};
+module.exports = {generateRSAKeys, decryptRSA, getSHA256Key, aesEncrypt, aesDecrypt, publicKeyToPem, privateKeyToPem};
