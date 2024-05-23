@@ -4,29 +4,7 @@ const {authenticate} = require('./middleware/auth');
 const {pool} = require("../configs/dbConfig");
 const crypto = require('crypto');
 require('dotenv').config();
-
-// Функции для шифрования
-function getSHA256Key(data) {
-    return crypto.createHash('sha256').update(data).digest('hex');
-}
-
-function aesEncrypt(text, hexKey) {
-    const key = Buffer.from(hexKey, 'hex');
-    const iv = Buffer.alloc(16); // Пока фиксированный вектор
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return encrypted;
-}
-
-function aesDecrypt(encrypted, hexKey) {
-    const key = Buffer.from(hexKey, 'hex');
-    const iv = Buffer.alloc(16); // Пока фиксированный вектор
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(encrypted, 'hex');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-}
+const {getSHA256Key, aesEncrypt, aesDecrypt} = require('./middleware/encryptionFunctions');
 
 // Отправить сообщение в беседу
 router.post('/:conversationId/messages', authenticate, async (req, res) => {

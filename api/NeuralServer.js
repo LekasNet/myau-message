@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {pool} = require("../configs/dbConfig");
 const {authenticate} = require("./middleware/auth");
+const {getSHA256Key, aesEncrypt} = require("./middleware/encryptionFunctions");
 
 // Получить последнее сообщение из беседы с колонкой read_admin = false
 router.get('/conversations/:conversationId/last_message', authenticate, async (req, res) => {
@@ -24,7 +25,21 @@ router.get('/conversations/:conversationId/last_message', authenticate, async (r
             await pool.query(`UPDATE messages
                               SET read_admin = true
                               WHERE id = $1`, [message.id]);
-            res.json(message);
+
+            const userQuery = {
+                text: `SELECT last_login
+                       FROM users
+                       WHERE id = $1`,
+                values: [req.userId],
+            };
+            const userResult = await pool.query(userQuery);
+
+            const user = userResult.rows[0];
+            const timestamp = user.last_login;
+
+            const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 64);
+
+            res.status(200).json(aesEncrypt(JSON.stringify(message), key));
         } else {
             res.status(404).json({error: 'No messages found'});
         }
