@@ -92,13 +92,15 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
         const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 64);
 
         const messagesQuery = {
-            text: `SELECT *
-                   FROM messages
-                   WHERE conversation_id = $1
-                     AND sent_at < $2
-                   ORDER BY sent_at DESC
+            text: `SELECT m.*
+                   FROM messages m
+                            JOIN participants p ON m.conversation_id = p.conversation_id
+                   WHERE m.conversation_id = $1
+                     AND m.sent_at < $2
+                     AND p.user_id = $3
+                   ORDER BY m.sent_at DESC
                    LIMIT 100;`,
-            values: [conversationId, fromDate],
+            values: [conversationId, fromDate, req.userId],
         };
 
         const messagesResult = await pool.query(messagesQuery);
@@ -109,14 +111,16 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
         });
 
         const conversationQuery = {
-            text: `SELECT user_id
-                   FROM conversations
-                   WHERE id = $1`,
-            values: [conversationId],
+            text: `SELECT c.creator_id
+                   FROM conversations c
+                            JOIN participants p ON c.id = p.conversation_id
+                   WHERE c.id = $1
+                     AND p.user_id = $2`,
+            values: [conversationId, req.userId],
         };
 
         const conversationResult = await pool.query(conversationQuery);
-        const conversationCreatorId = conversationResult.rows.user_id;
+        const conversationCreatorId = conversationResult.rows[0].creator_id;
 
         if (req.userId !== conversationCreatorId) {
             const updateQuery = {
