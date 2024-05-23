@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ic.enable()
+ic.disable()
 
 
 async def get_conversations():
