@@ -66,11 +66,13 @@ router.post('/login', async (req, res) => {
 
         const {publicKey, privateKey} = await generateRSAKeys();
 
+        const privateKeyPem = privateKeyToPem(privateKey);
+
         const updateQuery = {
             text: `UPDATE users
                    SET temporary_key = $1
                    WHERE id = $2`,
-            values: [privateKey, user.id],
+            values: [privateKeyPem, user.id],
         };
         await pool.query(updateQuery);
 
@@ -104,7 +106,7 @@ router.post('/login/verify', async (req, res) => {
             return res.status(401).json({error: 'Invalid username or password'});
         }
 
-        const privateKey = privateKeyToPem(user.temporary_key);
+        const privateKey = user.temporary_key;
         const decryptedPassword = await decryptRSA(password, privateKey);
         const decryptedLastLogin = await decryptRSA(lastLoginTimestamp, privateKey);
 
