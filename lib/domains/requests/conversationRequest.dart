@@ -23,4 +23,3 @@ Future<void> fetchUserConversations() async {
     throw Exception('Request failed with status: ${response.statusCode}.');
   }
 }
-

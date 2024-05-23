@@ -38,7 +38,7 @@ class LoginPage extends StatelessWidget {
                   TextField(
                     controller: _phoneController,
                     decoration: InputDecoration(
-                      hintText: 'Телефон',
+                      hintText: 'Логин',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0),
                         borderSide: BorderSide.none,

@@ -12,7 +12,9 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String formattedTime = DateFormat('HH:mm').format(message.timestamp);
+    DateTime timestampPlusThreeHours = message.timestamp.add(Duration(hours: 3));
+    String formattedTime = DateFormat('HH:mm').format(timestampPlusThreeHours);
+
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -40,7 +42,7 @@ class MessageBubble extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5 ),
             decoration: BoxDecoration(
-              color: message.isSentByMe ? Colors.blue : Colors.grey[300],
+              color: message.isBanned ? Colors.red : message.isSentByMe ? Colors.blue : Colors.grey[300],
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(

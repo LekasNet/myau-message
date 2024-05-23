@@ -31,7 +31,7 @@ class TokenManager {
 
   void startRefreshTokenCycle() {
     refreshToken();  // Немедленно обновить токен при запуске
-    _timer = Timer.periodic(Duration(seconds: 10), (Timer t) => refreshToken());
+    _timer = Timer.periodic(Duration(minutes: 59), (Timer t) => refreshToken());
   }
 
   void stopRefreshTokenCycle() {

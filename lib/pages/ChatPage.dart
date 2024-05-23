@@ -10,6 +10,7 @@ import '../domains/requests/conversationRequest.dart';
 import '../domains/requests/messageSendRequest.dart';
 import '../models/message.dart';
 import '../domains/security.dart' as security;
+import '../templates/convDescPopup.dart';
 
 class ChatScreen extends StatefulWidget {
   final String id;
@@ -31,7 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     fetchMessages(); // Загружаем начальные сообщения
-    timer = Timer.periodic(Duration(seconds: 10), (Timer t) => fetchMessages());
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => fetchMessages());
   }
 
   void fetchMessages() async {
@@ -57,10 +58,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _sendMessage() async {
     if (_controller.text.isNotEmpty) {
-      DateTime now = DateTime.now();
+      DateTime noww = DateTime.now();
+      DateTime now = noww.add(Duration(hours: 3));
       DateTime date = DateTime(now.day, now.hour, now.minute, now.second);
       fetchUserConversations();
-      sendMessage(widget.id, _controller.text);
+      sendMessage(widget.id, '${_controller.text} вот бы кто ответил(');
       setState(() {
         _controller.clear();
       });
@@ -94,6 +96,14 @@ class _ChatScreenState extends State<ChatScreen> {
             Text(widget.chatTitle),
           ],
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.more_vert, color: Colors.white),
+            onPressed: () {
+              showUserList(context, widget.id);  // Вызов функции showUserList
+            },
+          ),
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -104,7 +114,8 @@ class _ChatScreenState extends State<ChatScreen> {
             itemBuilder: (context, index) {
               return MessageBubble(message: messages[messages.length - 1 - index]);
             },
-          ),),
+          ),
+          ),
           SizedBox(height: 10,),
           Row(
             children: <Widget>[

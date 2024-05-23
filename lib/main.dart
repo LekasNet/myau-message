@@ -52,7 +52,6 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _checkLoginStatus();
-    if (_isLoggedIn) _tokenManager.startRefreshTokenCycle();
   }
 
   @override
@@ -65,6 +64,7 @@ class _MyAppState extends State<MyApp> {
     TokenStorage storage = TokenStorage();
     var tokens = await storage.getToken();
     if (tokens['accessToken']!.isNotEmpty) {
+      _tokenManager.startRefreshTokenCycle();
       setState(() {
         _isLoggedIn = true;
         _initialized = true;
