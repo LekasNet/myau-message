@@ -49,11 +49,8 @@ router.post('/:conversationId/messages', authenticate, async (req, res) => {
         const userResult = await pool.query(userQuery);
         const user = userResult.rows[0];
         const timestamp = user.last_login;
-        console.log(timestamp);
 
-        const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 32);
-
-        console.log(key);
+        const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 64);
 
         const query = {
             text: `INSERT INTO messages (conversation_id, user_id, content, sent_at)
@@ -91,7 +88,7 @@ router.get('/:conversationId/messages', authenticate, async (req, res) => {
         const user = userResult.rows[0];
         const timestamp = user.last_login;
 
-        const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 32);
+        const key = getSHA256Key(req.headers.authorization + timestamp).substring(0, 64);
 
         const query = {
             text: `WITH unread_messages AS (
