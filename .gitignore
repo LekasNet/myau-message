@@ -54,3 +54,4 @@ docs/_build/
 .env
 my_model
 criptor.py
+gen2

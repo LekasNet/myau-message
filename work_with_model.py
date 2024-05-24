@@ -5,16 +5,16 @@ from icecream import ic
 
 load_dotenv()
 
-ic.disable()
+ic.enable()
 
-model = AutoModelForSequenceClassification.from_pretrained('my_model')
-tokenizer = AutoTokenizer.from_pretrained('my_model')
+model = AutoModelForSequenceClassification.from_pretrained('gen2')
+tokenizer = AutoTokenizer.from_pretrained('gen2')
 
 
 themes = ["Программирование", "Кино", "Книги", "Музыка", "Игры", "Юмор", "Экономика", "История"]
 
 
-async def predict(theme, message, threshold=0.75):
+async def predict(theme, message, threshold=0.7):
     inputs = tokenizer.encode_plus(
         f"{message}",
         add_special_tokens=True,
