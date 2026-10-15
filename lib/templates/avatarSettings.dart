@@ -115,7 +115,7 @@ class DetailsPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Details Screen', style: Theme.of(context).textTheme.headline4),
+              Text('Details Screen', style: Theme.of(context).textTheme.headlineMedium),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {

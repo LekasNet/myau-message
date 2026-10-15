@@ -28,7 +28,7 @@ void showUserList(BuildContext context, String conversationId) {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('Пользователи беседы', style: Theme.of(context).textTheme.headline6),
+                child: Text('Пользователи беседы', style: Theme.of(context).textTheme.titleLarge),
               ),
               Expanded(
                 child: FutureBuilder<List<User>>(

@@ -87,7 +87,8 @@ class _MyAppState extends State<MyApp> {
       darkTheme: AppTheme.darkTheme,
       home: Stack(
         children: [
-          _isLoggedIn ? MainPage() : LoginPage(),
+          LoginPage(),
+          // _isLoggedIn ? MainPage() : LoginPage(),
           if (_showSplash)
             SplashScreen(onFinish: _removeSplash),
         ],

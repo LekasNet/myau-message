@@ -5,7 +5,7 @@ import 'package:myau_message/domains/security.dart';
 import '../handlers/tokenStorage.dart';
 
 
-Future<void> verify(String username, String password, String pem) async {
+Future<String> verify(String username, String password, String pem) async {
   String timestamp = DateTime.now().toIso8601String();
   var response = await http.post(
     Uri.parse('https://myau-message.onrender.com/api/users/login/verify'),
@@ -23,17 +23,16 @@ Future<void> verify(String username, String password, String pem) async {
     print("---------------");
     print(data);
     await TokenStorage().saveToken(data['accessToken'], data['refreshToken'], timestamp, username);
-    print("Tokens saved successfully.");
+    return 'success';
     // Proceed with navigation or further logic
   } else {
-    print("Failed to verify: ${response.body}");
+    return response.body;
     // Handle error
   }
 }
 
 
-Future<void> login(String username, String password) async {
-
+Future<String> login(String username, String password) async {
   var response = await http.post(
     Uri.parse('https://myau-message.onrender.com/api/users/login'),
     headers: <String, String>{
@@ -46,11 +45,15 @@ Future<void> login(String username, String password) async {
 
   if (response.statusCode == 200) {
     var data = jsonDecode(response.body);
-    print("Starting verifying with");
-    await verify(username, password, data["pem"]);
+    var responce = await verify(username, password, data["pem"]);
+    if (responce == 'success') {
+      return 'success'; // Возвращаем 'success' при успешном входе
+    } else {
+      return responce; // Возвращаем сообщение об ошибке от сервера
+    }
   } else {
-    print("Failed to login: ${response.body}");
-    // Handle error
+    return response.body; // Возвращаем сообщение об ошибке от сервера
   }
 }
+
 
